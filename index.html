@@ -1,0 +1,7 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DeusGolf</title><link rel="stylesheet" href="/src/style.css"></head>
+<body><header><h1>DeusGolf</h1><select id="courseSel"><option value="losverdes">Los Verdes GC (OSM)</option><option value="pebble">Pebble Beach (sample)</option></select><label>Tee <select id="tee"></select></label><span id="course"></span></header>
+<main><div class="mapwrap"><canvas id="map"></canvas></div>
+<aside><div id="hole"></div><div class="nav"><button id="prev">◀ Prev</button><button id="next">Next ▶</button><button id="reset">Replay</button></div>
+<h3>Club</h3><div id="clubs"></div><p class="hint">Click the map to aim · Space or Hit to swing. Bag: long-hitting scratch placeholder (Driver 290 carry).</p>
+<button id="hit" class="big">Hit</button><div id="log"></div><div id="card"></div><p id="attr" class="hint"></p></aside></main>
+<script type="module" src="/src/main.js"></script></body></html>

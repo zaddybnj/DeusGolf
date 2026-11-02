@@ -1,0 +1,8 @@
+*{box-sizing:border-box}html,body{height:100%}body{margin:0;font-family:system-ui;background:#f4f6f2;color:#1d2a1d;display:flex;flex-direction:column}
+header{display:flex;gap:1rem;align-items:center;padding:.5rem 1rem;background:#1f4d2b;color:#fff;flex-wrap:wrap}h1{margin:0;font-size:1.3rem}#course{opacity:.8;font-size:.9rem}
+main{flex:1;display:flex;gap:1rem;padding:1rem;min-height:0}.mapwrap{flex:1;min-width:0;display:flex}canvas{flex:1;width:100%;height:100%;border-radius:8px;box-shadow:0 2px 8px #0003;cursor:crosshair}
+aside{width:320px;flex-shrink:0;overflow-y:auto}h2{margin:.2rem 0}h2 small{font-weight:400;font-size:.9rem;color:#555}.big2{font-size:1.4rem;margin:.3rem 0}.src{font-size:.75rem;margin-top:.3rem}.ok{color:#1f6d2b}.warn{color:#a35a00}
+#clubs button{margin:2px;padding:5px 9px;border:1px solid #1f4d2b;background:#fff;border-radius:4px;cursor:pointer}#clubs button.on{background:#1f4d2b;color:#fff}.nav button{margin:.4rem .3rem 0 0}
+.big{font-size:1.1rem;padding:.6rem 2rem;background:#c33;color:#fff;border:0;border-radius:6px;margin:.5rem 0;cursor:pointer}.hint{font-size:.8rem;color:#555}#log{font-size:.85rem;max-height:200px;overflow:auto}
+#card table{border-collapse:collapse;font-size:.75rem}#card td,#card th{border:1px solid #ccc;padding:2px 4px}
+@media(max-width:800px){main{flex-direction:column}aside{width:auto}.mapwrap{min-height:70vh}}

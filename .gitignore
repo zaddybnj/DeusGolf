@@ -1,0 +1,27 @@
+# dependencies
+node_modules/
+
+# production build
+dist/
+.vite/
+
+# Netlify local state
+.netlify/
+
+# environment and logs
+.env
+.env.*
+!.env.example
+npm-debug.log*
+*.log
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Local preview screenshots (not part of the site)
+preview-hole1.png
+screenshot-losverdes.png
+
+# Large OSM XML extracts (~5 MB). Re-download; see README.
+scripts/*.osm
