@@ -24,6 +24,14 @@ This is a static Vite site. [`netlify.toml`](netlify.toml) sets the build comman
 
 Connect this GitHub repo in Netlify and deploy the `main` branch. No environment variables are required.
 
+## Phone and install (PWA)
+
+The site is a Progressive Web App aimed at a portrait phone. `npm run build` emits `manifest.webmanifest`, home-screen icons, and a service worker (`sw.js`) that precaches the app shell — including Los Verdes, which is bundled into the script — and serves `index.html` when a navigation is offline.
+
+On a phone, use the browser’s Install / Add to Home Screen action (Safari: Share → Add to Home Screen). The layout keeps the hole map on screen with 44px club chips and a full-width Hit control. Tap or click the map to aim, drag to pan, and pinch, scroll, or use +/− to zoom. Fit restores the whole hole. Desktop stays a side-by-side layout.
+
+Icons are generated with `python3 scripts/gen_pwa_icons.py` (no extra libraries) and committed under `public/icons/`.
+
 ## Courses
 
 - **Los Verdes Golf Course** (Rancho Palos Verdes, CA) — real hole geometry from OpenStreetMap: all 18 hole centerlines, greens, tees, bunkers, cart paths. OSM has fairway polygons only near holes 13–14, so fairways elsewhere are an approximated band along the centerline (labeled in the UI). Par/handicap/yardages (White & Blue) from the official scorecard (losverdesgc.com).

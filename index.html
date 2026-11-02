@@ -1,7 +1,66 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DeusGolf</title><link rel="stylesheet" href="/src/style.css"></head>
-<body><header><h1>DeusGolf</h1><select id="courseSel"><option value="losverdes">Los Verdes GC (OSM)</option><option value="pebble">Pebble Beach (sample)</option></select><label>Tee <select id="tee"></select></label><span id="course"></span></header>
-<main><div class="mapwrap"><canvas id="map"></canvas></div>
-<aside><div id="hole"></div><div class="nav"><button id="prev">◀ Prev</button><button id="next">Next ▶</button><button id="reset">Replay</button></div>
-<h3>Club</h3><div id="clubs"></div><p class="hint">Click the map to aim · Space or Hit to swing. Bag: long-hitting scratch placeholder (Driver 290 carry).</p>
-<button id="hit" class="big">Hit</button><div id="log"></div><div id="card"></div><p id="attr" class="hint"></p></aside></main>
-<script type="module" src="/src/main.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Preview real golf holes on your phone. DeusGolf plays Los Verdes GC in 2D.">
+  <meta name="theme-color" content="#1f4d2b">
+  <meta name="application-name" content="DeusGolf">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DeusGolf">
+  <title>DeusGolf</title>
+  <link rel="icon" href="/icons/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <h1>DeusGolf</h1>
+      <span id="course"></span>
+    </div>
+    <div class="header-controls">
+      <select id="courseSel" aria-label="Course">
+        <option value="losverdes">Los Verdes GC</option>
+        <option value="pebble">Pebble Beach (sample)</option>
+      </select>
+      <label class="tee">
+        <select id="tee" aria-label="Tee"></select>
+      </label>
+    </div>
+  </header>
+  <button id="install" type="button" hidden>Add to Home Screen</button>
+  <main>
+    <div class="mapwrap">
+      <canvas id="map" aria-label="Hole map. Tap to aim, drag to pan, pinch to zoom."></canvas>
+      <div class="map-tools">
+        <button id="zoomIn" type="button" aria-label="Zoom in">+</button>
+        <button id="zoomOut" type="button" aria-label="Zoom out">−</button>
+        <button id="fit" type="button">Fit</button>
+      </div>
+    </div>
+    <aside>
+      <div id="hole"></div>
+      <h3 class="clubs-label">Club</h3>
+      <div id="clubs" role="group" aria-label="Club"></div>
+      <div class="scroll-bits">
+        <p id="hint" class="hint"></p>
+        <div id="log" aria-live="polite"></div>
+        <div id="card"></div>
+        <p id="attr" class="hint"></p>
+      </div>
+      <div class="dock">
+        <div class="nav">
+          <button id="prev" type="button">Prev</button>
+          <button id="reset" type="button">Replay</button>
+          <button id="next" type="button">Next</button>
+        </div>
+        <button id="hit" class="big" type="button">Hit</button>
+      </div>
+    </aside>
+  </main>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
