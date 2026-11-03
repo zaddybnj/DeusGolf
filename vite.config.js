@@ -10,7 +10,7 @@ export default defineConfig({
       manifest: {
         name: 'DeusGolf',
         short_name: 'DeusGolf',
-        description: 'Phone-first golf course preview. Play Los Verdes GC in 2D with scratch placeholder yardages.',
+        description: 'Phone-first golf round planner. Preview Los Verdes GC, edit your bag, and save a plan against your score.',
         theme_color: '#1f4d2b',
         background_color: '#f4f6f2',
         display: 'standalone',

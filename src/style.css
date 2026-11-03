@@ -198,9 +198,16 @@ aside {
 
 .warn { color: #a35a00; }
 
-.clubs-label {
+.clubs-head {
   flex-shrink: 0;
-  margin: 0.1rem 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.clubs-label {
+  margin: 0;
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -325,4 +332,280 @@ aside {
   #clubs { flex-wrap: wrap; overflow: visible; }
   #clubs button { border-radius: 8px; }
   .dock { padding-bottom: 0.2rem; }
+}
+
+#planBtn {
+  flex: 0 0 auto;
+  min-height: var(--tap);
+  padding: 0 0.7rem;
+  border: 0;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--green);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.note-chip {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  z-index: 1;
+  max-width: calc(100% - 68px);
+  margin: 0;
+  padding: 0.35rem 0.55rem;
+  border-radius: 8px;
+  background: #fffc;
+  color: var(--ink);
+  font-size: 0.78rem;
+  line-height: 1.3;
+  box-shadow: 0 1px 4px #0003;
+  pointer-events: none;
+}
+
+.strategy {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.strat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.miss, .plan-step { display: flex; align-items: center; gap: 0.3rem; }
+
+.strat-k {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #5c6b5c;
+}
+
+.miss button, .plan-step button, .text-btn, #sheetClose, .tabs button, .ghost, .round-row {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.miss button, .plan-step button {
+  min-height: var(--tap);
+  min-width: var(--tap);
+  padding: 0 0.7rem;
+  border: 1px solid var(--green);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 0.9rem;
+}
+
+.miss button.on { background: var(--green); color: #fff; }
+
+#planVal {
+  min-width: 1.25rem;
+  text-align: center;
+  font-size: 1.15rem;
+  font-variant-numeric: tabular-nums;
+}
+
+#layup, .bag-row input, .score-table input {
+  min-height: var(--tap);
+  font-size: 16px;
+  font-family: inherit;
+  border: 1px solid #c5d0c4;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+}
+
+#layup { width: 100%; padding: 0 0.65rem; }
+
+.text-btn {
+  min-height: var(--tap);
+  border: 0;
+  background: transparent;
+  color: var(--green);
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0 0.15rem;
+}
+
+.card-label {
+  margin: 0.15rem 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #5c6b5c;
+}
+
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 100dvh;
+  z-index: 30;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.sheet[hidden] { display: none; }
+
+.sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: #0008;
+}
+
+.sheet-card {
+  position: relative;
+  width: min(520px, 100%);
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--ink);
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -8px 30px #0004;
+  padding-bottom: var(--safe-b);
+}
+
+.sheet-bar, .tabs { flex-shrink: 0; }
+
+.sheet-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0.7rem 0 0.9rem;
+}
+
+.sheet-bar h2 { margin: 0; font-size: 1.15rem; }
+
+#sheetClose {
+  min-height: var(--tap);
+  min-width: var(--tap);
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--green);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.tabs { display: flex; gap: 0.4rem; padding: 0 0.8rem 0.45rem; }
+
+.tabs button {
+  flex: 1;
+  min-height: var(--tap);
+  border: 1px solid var(--green);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--green);
+  font-weight: 700;
+}
+
+.tabs button.on { background: var(--green); color: #fff; }
+
+.pane {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 0 0.8rem 0.9rem;
+}
+
+.sheet-lead, .sheet-note, .bag-snap p { margin: 0 0 0.55rem; font-size: 0.85rem; color: #333; }
+
+.sheet-note { color: #555; }
+
+.bag-list { display: flex; flex-direction: column; gap: 0.4rem; margin: 0.7rem 0; }
+
+.bag-row {
+  display: grid;
+  grid-template-columns: 1fr 5.2rem;
+  gap: 0.4rem;
+}
+
+.bag-row input { width: 100%; padding: 0 0.55rem; }
+.bag-row input:disabled { background: #e7eee6; color: #667; }
+
+.ghost {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid var(--green);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--green);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.ghost.danger { border-color: #a33; color: #a33; margin-top: 0.8rem; }
+
+.save { margin-bottom: 0.45rem; }
+
+.round-list { display: flex; flex-direction: column; gap: 0.4rem; }
+
+.round-row {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid #c5d0c4;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  text-align: left;
+}
+
+.round-title { font-weight: 700; }
+.round-sub { font-size: 0.8rem; color: #444; }
+
+.round-heading { margin: 0.2rem 0 0.35rem; font-size: 1.05rem; }
+
+.cmp { margin: 0 0 0.5rem; font-weight: 700; }
+
+.bag-snap { margin-bottom: 0.6rem; font-size: 0.85rem; }
+.bag-snap summary { min-height: var(--tap); display: flex; align-items: center; cursor: pointer; }
+
+.score-scroll { overflow-x: auto; }
+
+.score-table { border-collapse: collapse; width: 100%; font-size: 0.85rem; }
+.score-table th, .score-table td { border-bottom: 1px solid #d5e0d6; padding: 0.2rem 0.25rem; text-align: center; }
+.score-table th[scope="row"] { text-align: left; }
+.score-table input { width: 3.4rem; padding: 0 0.2rem; text-align: center; }
+.note-row td { text-align: left; color: #444; font-size: 0.75rem; border-bottom: 1px solid #d5e0d6; }
+
+.delta.over { color: #a33; font-weight: 700; }
+.delta.under { color: #1f6d2b; font-weight: 700; }
+.delta.even { color: #555; font-weight: 700; }
+
+.back { margin-left: -0.15rem; }
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (min-width: 700px) {
+  .sheet { align-items: center; padding: 1rem; }
+  .sheet-card { border-radius: 16px; max-height: min(86dvh, 760px); }
 }
