@@ -1,15 +1,12 @@
 import {registerSW} from 'virtual:pwa-register';
 import {pebble} from './course.js';
 import lv from './courses/losverdes.json';
+import {esc, loadBag, saveBag} from './store.js';
+import {mountPlanner} from './plan.js';
 
 registerSW({immediate: true});
 
 const COURSES = {losverdes: lv, pebble};
-// Placeholder bag: long-hitting scratch golfer (carry yards)
-const CLUBS = {
-  Driver: 290, '3W': 260, '5W': 240, '4i': 220, '5i': 210, '6i': 200, '7i': 185,
-  '8i': 170, '9i': 155, PW: 140, 'GW 52°': 125, 'SW 56°': 105, 'LW 60°': 90, Putter: 0,
-};
 const $ = id => document.getElementById(id);
 const cv = $('map'), c = cv.getContext('2d');
 const MIN_Z = 0.85, MAX_Z = 10;
@@ -18,13 +15,23 @@ const COL = {
   water: '#3b7dc4', trees: '#3f6e34', path: '#c9c9c0', building: '#a99',
 };
 
-let course = lv, tee = lv.tees[0], h = 0, club = 'Driver', ball, aim, shots, trail, done, scores = {};
+let course = lv, tee = lv.tees[0], h = 0, club = 'driver', ball, aim, shots, trail, done, scores = {};
+let bag = loadBag();
+let planner = null;
 let S = 1, sc = 1, ox = 0, oy = 0, cxv = {W: 1, H: 1};
 let zoom = 1, panX = 0, panY = 0;
 const coarse = matchMedia('(pointer: coarse)').matches;
 
 const H = () => course.holes[h];
 const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+const carryOf = id => bag.find(c => c.id === id)?.carry || 0;
+const clubName = id => bag.find(c => c.id === id)?.name || id;
+
+function closestClub(yards) {
+  const list = bag.filter(c => c.id !== 'putter' && c.carry > 0);
+  if (!list.length) return 'putter';
+  return list.reduce((best, c) => Math.abs(c.carry - yards) < Math.abs(best.carry - yards) ? c : best).id;
+}
 
 function along(line, d) {
   for (let i = 1; i < line.length; i++) {
@@ -144,7 +151,7 @@ function poly(q, fill, stroke) {
 }
 
 function draw() {
-  if (cxv.W < 2 || cxv.H < 2) return;
+  if (!ball || !trail || cxv.W < 2 || cxv.H < 2) return;
   sc = S * zoom;
   const g = H();
   const ballR = coarse ? 6.5 : 4.5;
@@ -175,7 +182,7 @@ function draw() {
     c.stroke();
     c.restore();
   }
-  for (const t of ['trees', 'path', 'building', 'rough', 'fairway', 'tee', 'green', 'bunker', 'water']) {
+  for (const t of ['trees', 'building', 'rough', 'fairway', 'path', 'tee', 'green', 'bunker', 'water']) {
     for (const f of g.feats.filter(f => f.t === t)) {
       if (t === 'path') {
         c.strokeStyle = COL.path;
@@ -186,7 +193,8 @@ function draw() {
         continue;
       }
       c.lineWidth = 1;
-      poly(f.pts, COL[t] + (f.main || t === 'bunker' || t === 'water' ? '' : 'd0'), t === 'green' || t === 'bunker' ? '#0002' : null);
+      const solid = f.main || t === 'bunker' || t === 'water' || t === 'fairway';
+      poly(f.pts, COL[t] + (solid ? '' : 'd0'), t === 'green' || t === 'bunker' || t === 'fairway' ? '#0002' : null);
     }
   }
   c.setLineDash([2, 6]);
@@ -217,7 +225,7 @@ function draw() {
   c.stroke();
   c.setLineDash([]);
   if (!done) {
-    const d = CLUBS[club] || dist(ball, g.pin);
+    const d = carryOf(club) || dist(ball, g.pin);
     const an = Math.atan2(aim[0] - ball[0], aim[1] - ball[1]);
     const t = [ball[0] + Math.sin(an) * d, ball[1] + Math.cos(an) * d];
     c.strokeStyle = '#ff0a';
@@ -248,7 +256,8 @@ function draw() {
 }
 
 const autoAim = () => {
-  const g = H(), d = CLUBS[club];
+  const g = H(), d = carryOf(club);
+  if (!ball) return [...g.pin];
   if (!d || dist(ball, g.pin) <= d + 10) return [...g.pin];
   let best = g.pin, bd = 1e9;
   for (let k = 0; k <= g.osmYds; k += 3) {
@@ -266,7 +275,7 @@ function start() {
   shots = 0;
   trail = [[...ball]];
   done = false;
-  club = H().par === 3 ? (H().yds[tee] > 175 ? '5i' : '7i') : 'Driver';
+  club = H().par === 3 ? closestClub(H().yds[tee] > 175 ? 210 : 185) : closestClub(400);
   aim = autoAim();
   $('log').innerHTML = '';
   view();
@@ -277,8 +286,8 @@ function start() {
 function hit() {
   if (done) return;
   const g = H(), L = lie(ball);
-  let d = CLUBS[club];
-  if (club === 'Putter') {
+  let d = carryOf(club);
+  if (club === 'putter') {
     const r = dist(ball, g.pin) * 3;
     shots++;
     if (r < 3 || Math.random() < Math.max(.15, 1 - r / 40)) { finish(); return; }
@@ -287,14 +296,14 @@ function hit() {
     d *= ({rough: .9, 'deep rough': .75, bunker: .7, trees: .5}[L] || 1) * (.94 + Math.random() * .1);
     shots++;
   }
-  const an = Math.atan2(aim[0] - ball[0], aim[1] - ball[1]) + (Math.random() - .5) * (club === 'Putter' ? .05 : .12);
+  const an = Math.atan2(aim[0] - ball[0], aim[1] - ball[1]) + (Math.random() - .5) * (club === 'putter' ? .05 : .12);
   const prev = [...ball];
   ball = [ball[0] + Math.sin(an) * d, ball[1] + Math.cos(an) * d];
-  let nl = lie(ball), msg = `${club}: ${d.toFixed(0)} yds → ${nl}`;
+  let nl = lie(ball), msg = `${clubName(club)}: ${d.toFixed(0)} yds → ${nl}`;
   if (nl === 'water') { shots++; ball = prev; msg += ' — penalty, replay'; }
   trail.push([...ball]);
-  if (lie(ball) === 'green') club = 'Putter';
-  else if (dist(ball, g.pin) < 100) club = 'SW 56°';
+  if (lie(ball) === 'green') club = 'putter';
+  else if (dist(ball, g.pin) < 100) club = bag.some(c => c.id === 'sw') ? 'sw' : closestClub(105);
   aim = autoAim();
   log(msg);
   draw();
@@ -312,13 +321,17 @@ function finish() {
   info();
 }
 
-function log(m) { $('log').innerHTML = `<p>${m}</p>` + $('log').innerHTML; }
+function log(m) {
+  const p = document.createElement('p');
+  p.textContent = m;
+  $('log').prepend(p);
+}
 
 function renderClubs() {
   const el = $('clubs');
   const left = el.scrollLeft;
-  el.innerHTML = Object.entries(CLUBS).map(([k, v]) =>
-    `<button type="button" data-c="${k}" class="${k === club ? 'on' : ''}" aria-pressed="${k === club}">${k}${v ? ' ' + v : ''}</button>`
+  el.innerHTML = bag.map(item =>
+    `<button type="button" data-c="${item.id}" class="${item.id === club ? 'on' : ''}" aria-pressed="${item.id === club}">${esc(item.name)}${item.carry ? ' ' + item.carry : ''}</button>`
   ).join('');
   el.scrollLeft = left;
   const on = el.querySelector('.on');
@@ -332,15 +345,20 @@ function renderClubs() {
 function info() {
   const g = H(), r = g.real;
   $('course').textContent = course.name;
-  const src = g.approx
-    ? '<span class="warn">Approximate shapes</span>'
-    : `<span class="ok">OSM: green ✓ · ${r.bunkers} bunkers · tees ✓</span>${g.fwApprox ? ' <span class="warn">fairway approximated</span>' : ' · fairway ✓'}`;
+  let src;
+  if (g.approx) src = '<span class="warn">Approximate shapes</span>';
+  else {
+    const bits = ['green ✓', `${r.bunkers} bunkers`, 'tees ✓'];
+    if (!g.fwApprox) bits.push('fairway ✓');
+    if (r.water) bits.push('water ✓');
+    src = `<span class="ok">OSM: ${bits.join(' · ')}</span>${g.fwApprox ? ' <span class="warn">fairway approximated</span>' : ''}`;
+  }
   $('hole').innerHTML = `<div class="hole-top"><h2>Hole ${g.n} <small>Par ${g.par} · HCP ${g.hcp || '–'}</small></h2><div class="yds">${g.yds[tee]} yds · ${tee}</div></div><div class="status"><div class="big2">To pin <b>${dist(ball, g.pin).toFixed(0)}</b></div><div class="lie">Lie <b>${lie(ball)}</b> · ${shots}</div></div><div class="src">${src}</div>`;
   renderClubs();
   $('tee').innerHTML = course.tees.map(t => `<option ${t === tee ? 'selected' : ''}>${t}</option>`).join('');
   const t = Object.entries(scores);
   $('card').innerHTML = t.length
-    ? `<table><tr>${t.map(([i]) => `<th>${+i + 1}</th>`).join('')}<th>Tot</th></tr><tr>${t.map(([, s]) => `<td>${s}</td>`).join('')}<td>${t.reduce((a, [, s]) => a + s, 0)}</td></tr></table>`
+    ? `<p class="card-label">Preview</p><table><tr>${t.map(([i]) => `<th>${+i + 1}</th>`).join('')}<th>Tot</th></tr><tr>${t.map(([, s]) => `<td>${s}</td>`).join('')}<td>${t.reduce((a, [, s]) => a + s, 0)}</td></tr></table>`
     : '';
   $('attr').innerHTML = course.attribution.replace(
     'OpenStreetMap contributors',
@@ -349,6 +367,7 @@ function info() {
   const hitBtn = $('hit');
   hitBtn.disabled = done;
   hitBtn.textContent = done ? 'Holed' : 'Hit';
+  if (planner) planner.sync();
 }
 
 function canvasPos(e) {
@@ -453,18 +472,57 @@ $('fit').onclick = fitView;
 
 addEventListener('keydown', e => {
   if (e.code !== 'Space') return;
+  if (planner && planner.sheetOpen()) return;
   const tag = e.target && e.target.tagName;
   if (tag === 'BUTTON' || tag === 'SELECT' || tag === 'A' || tag === 'INPUT' || tag === 'TEXTAREA') return;
   e.preventDefault();
   hit();
 });
-addEventListener('resize', () => { view(); draw(); });
-if (window.visualViewport) visualViewport.addEventListener('resize', () => { view(); draw(); });
 
-$('hint').textContent = (coarse
-  ? 'Tap the map to aim. Drag to pan, pinch or +/− to zoom, then Hit. '
-  : 'Click the map to aim. Drag to pan, scroll to zoom. Space or Hit to swing. ')
-  + 'Bag: long-hitting scratch placeholder (Driver 290 carry).';
+function applyViewport() {
+  const vv = window.visualViewport;
+  const active = document.activeElement;
+  const editing = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA');
+  if (vv && (editing || (planner && planner.sheetOpen()))) {
+    document.body.style.height = `${Math.round(vv.height)}px`;
+  } else {
+    document.body.style.height = '';
+  }
+  if (planner) planner.placeSheet();
+  view();
+  draw();
+}
+
+addEventListener('resize', applyViewport);
+if (window.visualViewport) {
+  visualViewport.addEventListener('resize', applyViewport);
+  visualViewport.addEventListener('scroll', applyViewport);
+}
+document.addEventListener('focusin', applyViewport);
+document.addEventListener('focusout', () => setTimeout(applyViewport, 0));
+
+$('hint').textContent = coarse
+  ? 'Tap the map to aim. Drag to pan, pinch or +/− to zoom.'
+  : 'Click the map to aim. Drag to pan, scroll to zoom. Space or Hit to swing.';
+
+planner = mountPlanner({
+  getBag: () => bag,
+  setBag(next) {
+    bag = next;
+    saveBag(bag);
+    if (!done) aim = autoAim();
+    renderClubs();
+    draw();
+  },
+  getContext: () => ({
+    courseId: $('courseSel').value,
+    courseName: course.name,
+    tee,
+    holes: course.holes,
+    hole: H(),
+  }),
+  onLayout: applyViewport,
+});
 
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', e => {

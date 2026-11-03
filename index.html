@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="description" content="Preview real golf holes on your phone. DeusGolf plays Los Verdes GC in 2D.">
+  <meta name="description" content="Preview Los Verdes GC and plan a round on your phone. Edit your bag, save hole notes, and compare the plan with your score.">
   <meta name="theme-color" content="#1f4d2b">
   <meta name="application-name" content="DeusGolf">
   <meta name="mobile-web-app-capable" content="yes">
@@ -22,8 +22,9 @@
       <span id="course"></span>
     </div>
     <div class="header-controls">
+      <button id="planBtn" type="button" aria-expanded="false" aria-controls="sheet">Plan</button>
       <select id="courseSel" aria-label="Course">
-        <option value="losverdes">Los Verdes GC</option>
+        <option value="losverdes">Los Verdes</option>
         <option value="pebble">Pebble Beach (sample)</option>
       </select>
       <label class="tee">
@@ -40,10 +41,30 @@
         <button id="zoomOut" type="button" aria-label="Zoom out">−</button>
         <button id="fit" type="button">Fit</button>
       </div>
+      <p id="noteChip" class="note-chip" hidden></p>
     </div>
     <aside>
       <div id="hole"></div>
-      <h3 class="clubs-label">Club</h3>
+      <div class="strategy">
+        <div class="strat-row">
+          <div class="miss" role="group" aria-label="Miss side">
+            <span class="strat-k">Miss</span>
+            <button type="button" data-miss="left">Left</button>
+            <button type="button" data-miss="right">Right</button>
+          </div>
+          <div class="plan-step" role="group" aria-label="Plan score">
+            <span class="strat-k">Plan</span>
+            <button type="button" id="planMinus" aria-label="Lower plan score">−</button>
+            <b id="planVal">4</b>
+            <button type="button" id="planPlus" aria-label="Raise plan score">+</button>
+          </div>
+        </div>
+        <input id="layup" maxlength="80" placeholder="Layup note" aria-label="Layup note" autocomplete="off">
+      </div>
+      <div class="clubs-head">
+        <h3 class="clubs-label">Club</h3>
+        <button id="editBag" type="button" class="text-btn">Edit bag</button>
+      </div>
       <div id="clubs" role="group" aria-label="Club"></div>
       <div class="scroll-bits">
         <p id="hint" class="hint"></p>
@@ -61,6 +82,21 @@
       </div>
     </aside>
   </main>
+  <div id="sheet" class="sheet" hidden>
+    <div class="sheet-backdrop" data-close="1"></div>
+    <div class="sheet-card" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+      <div class="sheet-bar">
+        <h2 id="sheetTitle">Plan</h2>
+        <button id="sheetClose" type="button">Close</button>
+      </div>
+      <div class="tabs" role="tablist">
+        <button id="tabRounds" type="button" role="tab" aria-selected="true" aria-controls="paneRounds">Rounds</button>
+        <button id="tabBag" type="button" role="tab" aria-selected="false" aria-controls="paneBag">Bag</button>
+      </div>
+      <div id="paneRounds" class="pane" role="tabpanel"></div>
+      <div id="paneBag" class="pane" role="tabpanel" hidden></div>
+    </div>
+  </div>
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>
